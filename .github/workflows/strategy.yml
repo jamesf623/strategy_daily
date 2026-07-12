@@ -1,0 +1,58 @@
+name: 股票双策略定时运行
+
+permissions:
+  contents: write
+  actions: read
+
+on:
+  schedule:
+    # 北京时间每天 17:00（UTC 9:00）运行，美股已收盘
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-strategy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 拉取代码
+      uses: actions/checkout@v4
+
+    - name: 设置Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: 安装依赖
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 执行策略回测
+      env:
+        T_LOW_MIN: ${{ vars.T_LOW_MIN || 20 }}
+        T_LOW_MAX: ${{ vars.T_LOW_MAX || 50 }}
+        T_HIGH_IN: ${{ vars.T_HIGH_IN || 76 }}
+        T_HIGH_OUT: ${{ vars.T_HIGH_OUT || 66 }}
+      run: |
+        echo "🚀 开始执行策略回测..."
+        python strategy.py
+        echo "✅ 策略执行完成"
+
+    - name: 提交更新后的数据
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add stock_data/
+        git diff --quiet && git diff --staged --quiet || (git commit -m "📊 自动更新股票数据 $(date +'%Y-%m-%d')" && git push)
+        echo "✅ 数据提交成功"
+
+    - name: 上传日志和图表
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: strategy-results
+        path: |
+          stock_data/
+          *.png
+        retention-days: 7

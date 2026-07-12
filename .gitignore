@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 数据文件（可选，如果不想提交数据到仓库，取消注释）
+# stock_data/
+
+# 图片
+*.png
+*.jpg
+*.jpeg
+
+# 日志
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
