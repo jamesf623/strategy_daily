@@ -5,9 +5,6 @@ permissions:
   actions: read
 
 on:
-  schedule:
-#    # 北京时间每天 17:00（UTC 9:00）运行，美股已收盘
-#    - cron: '0 9 * * *'
   workflow_dispatch:
 
 jobs:
